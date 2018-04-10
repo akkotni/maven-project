@@ -3,6 +3,7 @@ pipeline {
 
     parameters {
          string(name: 'tomcat_dev', defaultValue: '107.22.24.187', description: 'Staging Server')
+         string(name: 'tomcat_prod', defaultValue: '52.87.193.205', description: 'Production Server')
     }
 
     triggers {
@@ -23,12 +24,19 @@ stages{
         }
 
         stage ('Deployments'){
-            
+            parallel{
                 stage ('Deploy to Staging'){
                     steps {
-                        bat "scp -r C:/Users/akkot/Devops/maven_project.pem **/target/*.war ec2-user@${params.tomcat_dev}:/var/lib/tomcat8/webapps"
+                        bat "winscp -r C:/Users/akkot/Devops/maven_project.pem **/target/*.war ec2-user@${params.tomcat_dev}:/var/lib/tomcat8/webapps"
+                    }
+                }
+
+                stage ("Deploy to Production"){
+                    steps {
+                        bat "winscp -r C:/Users/akkot/Devops/maven_project.pem **/target/*.war ec2-user@${params.tomcat_prod}:/var/lib/tomcat8/webapps"
                     }
                 }
             }
-       }
+        }
     }
+}
